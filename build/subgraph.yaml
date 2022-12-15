@@ -2,66 +2,41 @@ specVersion: 0.0.4
 schema:
   file: schema.graphql
 dataSources:
-  - kind: ethereum
-    name: AsksV1
+  - kind: ethereum/contract
+    name: erc721
     network: canto
     source:
-      address: "0x296419c5ee412823ab21955b838510e6068db895"
-      abi: AsksV1
+      abi: IERC721
       startBlock: 1700000
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - AskEvent
+        - ERC721Contract
       abis:
-        - name: AsksV1
-          file: AsksV1/abis/AsksV1.json
+        - name: IERC721
+          file: erc721/abis/IERC721EnumerableMetadata.json
       eventHandlers:
-        - event: AskCanceled(indexed address,indexed
-            uint256,(address,address,address,uint16,uint256))
-          handler: handleAskCanceled
-        - event: AskCreated(indexed address,indexed
-            uint256,(address,address,address,uint16,uint256))
-          handler: handleAskCreated
-        - event: AskFilled(indexed address,indexed uint256,indexed
-            address,address,(address,address,address,uint16,uint256))
-          handler: handleAskFilled
-        - event: AskPriceUpdated(indexed address,indexed
-            uint256,(address,address,address,uint16,uint256))
-          handler: handleAskPriceUpdated
-      file: AsksV1/AsksV1.wasm
-  - kind: ethereum
-    name: OffersV1
-    network: canto
-    source:
-      address: "0xd3495421e0a09eeb3b58ff8a8427ba6b411c3aae"
-      abi: OffersV1
-      startBlock: 1700000
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: erc721/erc721.wasm
+templates:
+  - name: ERC721Metadata
+    kind: file/ipfs
     mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
+      file: templates/ERC721Metadata/ERC721Metadata.wasm
+      handler: handleMetadata
       entities:
-        - OfferCanceled
-        - OfferCreated
-        - OfferFilled
-        - OfferUpdated
+        - ERC721Metadata
       abis:
-        - name: OffersV1
-          file: OffersV1/abis/OffersV1.json
-      eventHandlers:
-        - event: OfferCanceled(indexed address,indexed uint256,indexed
-            uint256,(address,address,uint16,uint256))
-          handler: handleOfferCanceled
-        - event: OfferCreated(indexed address,indexed uint256,indexed
-            uint256,(address,address,uint16,uint256))
-          handler: handleOfferCreated
-        - event: OfferFilled(indexed address,indexed uint256,indexed
-            uint256,address,address,(address,address,uint16,uint256))
-          handler: handleOfferFilled
-        - event: OfferUpdated(indexed address,indexed uint256,indexed
-            uint256,(address,address,uint16,uint256))
-          handler: handleOfferUpdated
-      file: OffersV1/OffersV1.wasm
+        - name: IERC721
+          file: ERC721Metadata/abis/IERC721EnumerableMetadata.json
+features:
+  - fullTextSearch

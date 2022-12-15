@@ -1,58 +1,87 @@
-type Ask @entity(immutable: false) {
-  id: ID!
-  tokenContract: Bytes! # address
-  tokenId: BigInt! # uint256
-  ask_live: Boolean! # bool
-  buyer: Bytes! # address
-  finder: Bytes! # address
-  ask_seller: Bytes! # address
-  ask_sellerFundsRecipient: Bytes! # address
-  ask_askCurrency: Bytes! # address
-  ask_findersFeeBps: Int! # uint16
-  ask_askPrice: BigInt! # uint256
-  ask_events: [AskEvent!]! @derivedFrom(field: "ask")
+type Account @entity {
+	id: Bytes!
+	asERC721: ERC721Contract
+	ERC721tokens: [ERC721Token!]! @derivedFrom(field: "owner")
+	ERC721operatorOwner: [ERC721Operator!]! @derivedFrom(field: "owner")
+	ERC721operatorOperator: [ERC721Operator!]! @derivedFrom(field: "operator")
+	ERC721transferFromEvent: [ERC721Transfer!]! @derivedFrom(field: "from")
+	ERC721transferToEvent: [ERC721Transfer!]! @derivedFrom(field: "to")
+	events: [Event!]! @derivedFrom(field: "emitter")
+}
+type ERC721Contract @entity {
+	id: Bytes!
+	asAccount: Account!
+	supportsMetadata: Boolean
+	isEnumerable: Boolean
+	name: String
+	symbol: String
+	tokens: [ERC721Token!]! @derivedFrom(field: "contract")
+	operators: [ERC721Operator!]! @derivedFrom(field: "contract")
+	transfers: [ERC721Transfer!]! @derivedFrom(field: "contract")
+	totalSupply: BigInt!
+}
+type ERC721Token @entity {
+	id: ID!
+	contract: ERC721Contract!
+	identifier: BigInt!
+	owner: Account!
+	approval: Account!
+	uri: String
+	transfers: [ERC721Transfer!]! @derivedFrom(field: "token")
+	metadata: [ERC721Metadata!]! @derivedFrom(field: "token")
+}
+type ERC721Operator @entity {
+	id: ID!
+	contract: ERC721Contract!
+	owner: Account!
+	operator: Account!
+	approved: Boolean!
+}
+type ERC721Transfer implements Event @entity(immutable: true) {
+	id: ID!
+	emitter: Account!
+	transaction: Transaction!
+	timestamp: BigInt!
+	contract: ERC721Contract!
+	token: ERC721Token!
+	from: Account!
+	to: Account!
+}
+type ERC721Metadata @entity {
+	id: ID!
+	token: ERC721Token!
+	metadataIndex: String!
+	name: String!
+	description: String!
+	image: String!
+	external_uri: String!
+	attributes: [ERC721Attribute!]! @derivedFrom(field: "metadata")
+}
+type ERC721Attribute @entity {
+	id: ID!
+	metadata: ERC721Metadata!
+	trait_type: String!
+	value: String!
+}
+interface Event {
+	id: ID!
+	transaction: Transaction!
+	emitter: Account!
+	timestamp: BigInt!
+}
+type Transaction @entity(immutable: true) {
+	id: ID!
+	timestamp: BigInt!
+	blockNumber: BigInt!
+	events: [Event!]! @derivedFrom(field: "transaction")
 }
 
-type AskEvent @entity (immutable: false) {
-  id: ID!
-  eventType: AskEventType
-  time: BigInt!
-  ask: Ask!
-}
-
-enum AskEventType {
-  ASK_CREATED
-  ASK_CANCELED
-  ASK_PRICE_UPDATED
-  ASK_FILLED
-}
-
-type Offer @entity(immutable: false) {
-  id: ID!
-  tokenContract: Bytes! # address
-  tokenId: BigInt! # uint256
-  offer_live: Boolean! # bool
-  offer_id: BigInt! # uint256
-  taker: Bytes! # address
-  finder: Bytes! # address
-  offer_maker: Bytes! # address
-  offer_currency: Bytes! # address
-  offer_findersFeeBps: Int! # uint16
-  offer_amount: BigInt! # uint256
-  offer_events: [OfferEvent!]! @derivedFrom(field: "offer")
-
-}
-
-type OfferEvent @entity (immutable: false) {
-  id: ID!
-  eventType: OfferEventType
-  time: BigInt!
-  offer: Offer!
-}
-
-enum OfferEventType {
-  OFFER_CREATED
-  OFFER_CANCELED
-  OFFER_PRICE_UPDATED
-  OFFER_FILLED
-}
+type _Schema_
+  @fulltext(
+    name: "metadataSearch"
+    language: en
+    algorithm: rank
+    include: [{entity: "ERC721Metadata", fields:
+      [{ name: "name" }, { name: "description" }, { name: "external_uri" }, { name: "attributes" }
+    ] }]
+  )
