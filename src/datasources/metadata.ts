@@ -10,17 +10,8 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import {
-	Account,
-	ERC721Contract,
-	ERC721Token,
-	ERC721Operator,
 	ERC721Metadata,
-	ERC721Attribute
 } from '../../generated/schema'
-
-import {
-	IERC721,
-} from '../../generated/erc721/IERC721'
 
 export function handleMetadata(content: Bytes): void { 
 

@@ -82,6 +82,6 @@ type _Schema_
     language: en
     algorithm: rank
     include: [{entity: "ERC721Metadata", fields:
-      [{ name: "name" }, { name: "description" }, { name: "external_uri" }, { name: "attributes" }
+      [{name: "image"}, { name: "name" }, { name: "description" }, { name: "external_uri" }
     ] }]
   )

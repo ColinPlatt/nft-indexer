@@ -14,7 +14,6 @@ import {
 	ERC721Contract,
 	ERC721Token,
 	ERC721Operator,
-	ERC721Metadata,
 	ERC721Attribute
 } from '../../generated/schema'
 
@@ -29,6 +28,10 @@ import {
 import {
 	supportsInterface,
 } from './erc165'
+
+import  {
+	ERC721Metadata
+} from  '../../generated/templates'
 
 
 export function fetchERC721(address: Address): ERC721Contract | null {
@@ -109,6 +112,9 @@ export function fetchERC721Token(contract: ERC721Contract, identifier: BigInt): 
 		let erc721       = IERC721.bind(Address.fromBytes(contract.id))
 		let try_tokenURI = erc721.try_tokenURI(identifier)
 		token.uri        = try_tokenURI.reverted ? '' : try_tokenURI.value
+		if(token.uri != null){
+			ERC721Metadata.create(try_tokenURI.value)
+		}
 	}
 
 	return token as ERC721Token
