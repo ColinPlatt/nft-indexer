@@ -75,3 +75,13 @@ type Transaction @entity(immutable: true) {
 	blockNumber: BigInt!
 	events: [Event!]! @derivedFrom(field: "transaction")
 }
+
+type _Schema_
+  @fulltext(
+    name: "metadataSearch"
+    language: en
+    algorithm: rank
+    include: [{entity: "ERC721Metadata", fields:
+      [{ name: "name" }, { name: "description" }, { name: "external_uri" }, { name: "attributes" }
+    ] }]
+  )
