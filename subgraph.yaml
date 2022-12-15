@@ -1,0 +1,67 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: AsksV1
+    network: canto
+    source:
+      address: "0x296419c5ee412823ab21955b838510e6068db895"
+      abi: AsksV1
+      startBlock: 1700000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - AskEvent
+      abis:
+        - name: AsksV1
+          file: ./abis/AsksV1.json
+      eventHandlers:
+        - event: AskCanceled(indexed address,indexed
+            uint256,(address,address,address,uint16,uint256))
+          handler: handleAskCanceled
+        - event: AskCreated(indexed address,indexed
+            uint256,(address,address,address,uint16,uint256))
+          handler: handleAskCreated
+        - event: AskFilled(indexed address,indexed uint256,indexed
+            address,address,(address,address,address,uint16,uint256))
+          handler: handleAskFilled
+        - event: AskPriceUpdated(indexed address,indexed
+            uint256,(address,address,address,uint16,uint256))
+          handler: handleAskPriceUpdated
+      file: ./src/asks-v-1.ts
+  - kind: ethereum
+    name: OffersV1
+    network: canto
+    source:
+      address: "0xd3495421e0a09eeb3b58ff8a8427ba6b411c3aae"
+      abi: OffersV1
+      startBlock: 1700000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - OfferCanceled
+        - OfferCreated
+        - OfferFilled
+        - OfferUpdated
+      abis:
+        - name: OffersV1
+          file: ./abis/OffersV1.json
+      eventHandlers:
+        - event: OfferCanceled(indexed address,indexed uint256,indexed
+            uint256,(address,address,uint16,uint256))
+          handler: handleOfferCanceled
+        - event: OfferCreated(indexed address,indexed uint256,indexed
+            uint256,(address,address,uint16,uint256))
+          handler: handleOfferCreated
+        - event: OfferFilled(indexed address,indexed uint256,indexed
+            uint256,address,address,(address,address,uint16,uint256))
+          handler: handleOfferFilled
+        - event: OfferUpdated(indexed address,indexed uint256,indexed
+            uint256,(address,address,uint16,uint256))
+          handler: handleOfferUpdated
+      file: ./src/offers-v-1.ts
